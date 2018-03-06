@@ -13,14 +13,14 @@ data Film = Film{
     title :: String,
     director :: String,
     release :: Int,
-    usersLiked :: [User],
-    usersDisliked :: [User]
+    usersLiked :: [String],
+    usersDisliked :: [String]
 } deriving (Show)
 
 --A function that returns the testDatabase. It's not really storing it.
 testDatabase :: [Film]
 --testDatabase = [Film "A film" "A director" 1048 [] [], Film "Second" "Another director" 2000 [] []]
-testDatabase = [Film "Blade Runner" "Ridley Scott" 1982 [] [], Film "The Fly" "David Cronenberg" 1986 [] [], Film "Body of Lies" "Ridley Scott" 2008 [] [] ]
+testDatabase = [Film "Blade Runner" "Ridley Scott" 1982 ["Zoe", "Heidi"] ["Sam"], Film "The Fly" "David Cronenberg" 1986 [] [], Film "Body of Lies" "Ridley Scott" 2008 ["Something"] ["Third"] ]
 
 --Add a film to the database by taking a list of films and the film to add.
 addFilm :: [Film] -> Film -> [Film]
@@ -35,6 +35,13 @@ filmsByDirector [] _ = []
 filmsByDirector (x:xs) d
     | director x == d = x:filmsByDirector xs d
     | otherwise = filmsByDirector xs d
+
+totalRatings :: Film -> Int
+totalRatings f = (length $ usersLiked f) + (length $ usersDisliked f)
+
+getWebsiteRating :: Film -> Float
+getWebsiteRating f = (fromIntegral (length $ usersLiked f)) / (fromIntegral (totalRatings f))
+--getWebsiteRating f = 10 / 5
 
 --Films as string function which returns a film formatted in a readable form.
 
