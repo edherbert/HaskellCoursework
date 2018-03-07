@@ -20,7 +20,7 @@ data Film = Film{
 --A function that returns the testDatabase. It's not really storing it.
 testDatabase :: [Film]
 --testDatabase = [Film "A film" "A director" 1048 [] [], Film "Second" "Another director" 2000 [] []]
-testDatabase = [Film "Blade Runner" "Ridley Scott" 1982 ["Zoe", "Heidi"] ["Sam"], Film "The Fly" "David Cronenberg" 1986 [] [], Film "Body of Lies" "Ridley Scott" 2008 ["Something"] ["Third"] ]
+testDatabase = [Film "Blade Runner" "Ridley Scott" 1982 ["Zoe", "Heidi", "Another", "Someone else"] ["Sam"], Film "The Fly" "David Cronenberg" 1986 ["First"] [], Film "Body of Lies" "Ridley Scott" 2008 ["Something"] ["Third", "Zoe"] ]
 
 --Add a film to the database by taking a list of films and the film to add.
 addFilm :: [Film] -> Film -> [Film]
@@ -36,12 +36,41 @@ filmsByDirector (x:xs) d
     | director x == d = x:filmsByDirector xs d
     | otherwise = filmsByDirector xs d
 
+--Get the total number of ratings a film has
 totalRatings :: Film -> Int
 totalRatings f = (length $ usersLiked f) + (length $ usersDisliked f)
 
-getWebsiteRating :: Film -> Float
-getWebsiteRating f = (fromIntegral (length $ usersLiked f)) / (fromIntegral (totalRatings f))
+getWebsiteRating :: Film -> Int
+getWebsiteRating f = round ((fromIntegral (length $ usersLiked f)) / (fromIntegral (totalRatings f)) * 100)
 --getWebsiteRating f = 10 / 5
+
+getFilmsWith75 :: [Film] -> [Film]
+getFilmsWith75 [] = []
+getFilmsWith75 (x:xs)
+  | getWebsiteRating x >= 75 = x:getFilmsWith75 xs
+  | otherwise = getFilmsWith75 xs
+
+getSumativeRatings :: [Film] -> Int
+getSumativeRatings [] = 0
+getSumativeRatings (x:xs) = (getWebsiteRating x) + getSumativeRatings xs
+
+averageforDirector :: [Film] -> Int
+averageforDirector x = div (getSumativeRatings x) (length x)
+
+filmsByUser :: String -> [Film] -> [Film]
+filmsByUser _ [] = []
+filmsByUser u (x:xs)
+  | elem u (usersLiked x) || elem u (usersDisliked x) = x:filmsByUser u xs
+  | otherwise = filmsByUser u xs
+
+addUserToFilmLikes :: String -> Film -> Film
+addUserToFilmLikes user f = f { usersLiked = user:(usersLiked f) }
+
+likeFilm :: String -> String -> [Film] -> [Film]
+likeFilm _ _ [] = []
+likeFilm user filmName (x:xs)
+  | title x == filmName = (addUserToFilmLikes user x):likeFilm user filmName xs
+  | otherwise = likeFilm user filmName xs
 
 --Films as string function which returns a film formatted in a readable form.
 
