@@ -169,52 +169,76 @@ main = do
     putStrLn "Please enter your name:"
     name <- getLine
     putStrLn ("Hey " ++ name ++ "")
-    loop
+    loop name testDatabase
 
-loop = do
+loop :: String -> [Film] -> IO ()
+loop name films = do
   putStrLn mainMenu
   input <- getLine
   if input == "1"
-    then first
+    then first name films
     else do
   if input == "2"
-    then second
+    then second name films
     else do
   if input == "3"
-    then third
+    then third name films
     else do
   if input == "4"
-    then fourth
+    then fourth name films
     else do
   if input == "5"
-    then fifth
+    then fifth name films
     else do
-    putStrLn "Nothing"
-  loop
+  if input == "9"
+    then exit name
+    else do
+    putStrLn "Please enter a number"
+    loop name films
 
-test = do
-  putStrLn $ formatFilmList testDatabase
+first :: String -> [Film] -> IO ()
+first name films = do
+    putStrLn "Adding new film"
+    putStrLn "Film title:"
+    title <- getLine
+    putStrLn "director:"
+    director <- getLine
+    putStrLn "Release date:"
+    releaseDate <- getLine
+    putStrLn "Film added."
+    loop name $ (Film title director (read releaseDate) [] []):films
 
-first = do
-    putStrLn "first"
+second :: String -> [Film] -> IO ()
+second name films = do
+    putStrLn $ formatFilmList films
+    loop name films
 
-second = do
-    putStrLn "second"
-
-third = do
+third :: String -> [Film] -> IO ()
+third name films = do
     putStrLn "Please enter the director name:"
     director <- getLine
-    putStrLn $ formatFilmList $ filmsByDirector testDatabase director
-    loop
+    putStrLn $ formatFilmList $ filmsByDirector films director
+    loop name films
 
-fourth = do
-    putStrLn $ formatFilmList $ getFilmsWith75 testDatabase
-    loop
+fourth :: String -> [Film] -> IO ()
+fourth name films = do
+    putStrLn $ formatFilmList $ getFilmsWith75 films
+    loop name films
 
-fifth = do
+fifth :: String -> [Film] -> IO ()
+fifth name films = do
     putStrLn "Please enter the director name:"
     director <- getLine
-    putStrLn $ show $ averageForDirector director testDatabase
+    putStrLn $ show $ averageForDirector director films
+    loop name films
+
+sixth :: String -> [Film] -> IO ()
+sixth name films = do
+  putStrLn "Sixth"
+
+exit :: String -> IO ()
+exit name = do
+  putStrLn $ "Bye " ++ name ++ "."
 --Films as string function which returns a film formatted in a readable form.
 
 -- Demo function to test basic functionality (without persistence - i.e.
